@@ -1,0 +1,16 @@
+{
+  "version": "0.1.0",
+  "mcp": {
+    "endpoint": "http://localhost:8000",
+    "timeout": 30,
+    "retry_attempts": 3
+  },
+  "agents": {
+    "default_timeout": 60,
+    "max_concurrent": 5
+  },
+  "workflows": {
+    "log_level": "INFO",
+    "enable_logging": true
+  }
+}

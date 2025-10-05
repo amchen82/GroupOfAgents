@@ -1,193 +1,134 @@
 # GroupOfAgents
 
-A web application for managing multi-agent systems with MCP (Model Context Protocol) server integration and visual workflow orchestration.
+A Python framework for building multi-agent systems with Model Context Protocol (MCP) workflow support.
 
 ## Features
 
-- **Agent Management**: Create and configure AI agents with specific roles and capabilities
-- **MCP Server Integration**: Connect agents to various MCP servers for enhanced functionality
-- **Workflow Designer**: Define workflows with visual representation of agent cooperation
-- **Visual Flow Diagram**: Interactive visualization of agent workflows using ReactFlow
-- **Agent Orchestration**: Define dependencies and execution order for complex multi-agent tasks
-
-## Architecture
-
-The application consists of:
-- **Backend**: Express.js REST API server (port 3001)
-- **Frontend**: React application with Vite build system
-- **Data Storage**: File-based JSON storage for agents and workflows
-- **Visualization**: ReactFlow for interactive workflow diagrams
+- 🤖 **Multi-Agent System**: Easily create and manage multiple agents working together
+- 🔄 **Workflow Management**: Define complex workflows with agent coordination
+- 🔌 **MCP Integration**: Built-in support for Model Context Protocol
+- 🧪 **Well-Tested**: Comprehensive test coverage with pytest
+- 📦 **Easy to Use**: Simple API for creating agents and workflows
 
 ## Installation
 
-### Prerequisites
-- Node.js (v18 or higher)
-- npm
+### From Source
 
-### Setup
-
-1. Clone the repository:
 ```bash
+# Clone the repository
 git clone https://github.com/amchen82/GroupOfAgents.git
 cd GroupOfAgents
+
+# Install in development mode
+pip install -e .
+
+# Or install with development dependencies
+pip install -e ".[dev]"
 ```
 
-2. Install dependencies:
+## Quick Start
+
+Here's a simple example to get you started:
+
+```python
+import asyncio
+from group_of_agents.agents.base import BaseAgent
+from group_of_agents.workflows.base import BaseWorkflow
+
+
+class MyAgent(BaseAgent):
+    async def execute(self, task: str, context=None):
+        return f"[{self.name}] Processed: {task}"
+
+
+class MyWorkflow(BaseWorkflow):
+    async def run(self, input_data, context=None):
+        results = []
+        for agent in self.agents:
+            result = await agent.execute(input_data, context)
+            results.append(result)
+        return results
+
+
+async def main():
+    # Create agents
+    agent1 = MyAgent(name="Agent-1")
+    agent2 = MyAgent(name="Agent-2")
+    
+    # Create workflow
+    workflow = MyWorkflow(name="MyWorkflow")
+    workflow.add_agent(agent1)
+    workflow.add_agent(agent2)
+    
+    # Run workflow
+    results = await workflow.run("Hello, World!")
+    print(results)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+For more examples, check the [examples](./examples) directory.
+
+## Project Structure
+
+```
+GroupOfAgents/
+├── src/
+│   └── group_of_agents/
+│       ├── agents/          # Agent implementations
+│       ├── mcp/             # MCP protocol support
+│       ├── workflows/       # Workflow definitions
+│       └── utils/           # Utility functions
+├── tests/                   # Test suite
+├── examples/                # Example scripts
+├── config/                  # Configuration files
+└── docs/                    # Documentation
+```
+
+## Development
+
+### Setup Development Environment
+
 ```bash
-npm install
-cd frontend && npm install
-cd ..
+# Install development dependencies
+pip install -e ".[dev]"
 ```
 
-## Usage
+### Running Tests
 
-### Development Mode
-
-Run the backend and frontend separately for development:
-
-**Terminal 1 - Backend:**
 ```bash
-npm run dev:backend
-```
-The backend API will start on http://localhost:3001
+# Run all tests
+pytest
 
-**Terminal 2 - Frontend:**
+# Run with coverage
+pytest --cov=group_of_agents --cov-report=html
+
+# Run specific test file
+pytest tests/agents/test_base.py
+```
+
+### Code Quality
+
 ```bash
-npm run dev:frontend
-```
-The frontend dev server will start on http://localhost:5173
+# Format code with black
+black src/ tests/
 
-### Production Mode
+# Lint with ruff
+ruff check src/ tests/
 
-1. Build the frontend:
-```bash
-npm run build
-```
-
-2. Start the server:
-```bash
-npm start
+# Type checking with mypy
+mypy src/
 ```
 
-The application will be available at http://localhost:3001
+## Configuration
 
-## Application Guide
+Configuration can be provided through:
 
-### Creating Agents
-
-1. Navigate to the "Agents" tab
-2. Click "New Agent" button
-3. Fill in agent details:
-   - **Name**: Unique identifier for the agent
-   - **Description**: Brief description of the agent's purpose
-   - **Role**: The agent's role in workflows (e.g., analyst, coordinator, executor)
-   - **Capabilities**: Description of what the agent can do
-   - **MCP Servers**: Configure access to MCP servers
-     - Add server name, endpoint, and description
-     - Agents can have multiple MCP server connections
-
-### Managing MCP Servers
-
-For each agent, you can configure access to various MCP servers:
-- **Server Name**: Identifier for the MCP server
-- **Endpoint**: URL or command to access the server
-- **Description**: What functionality this server provides
-
-### Creating Workflows
-
-1. Navigate to the "Workflows" tab
-2. Click "New Workflow" button
-3. Configure the workflow:
-   - **Name**: Workflow identifier
-   - **Description**: Brief description
-   - **Workflow Description**: Detailed description of agent cooperation and flow
-   - **Steps**: Define the sequence of agent actions
-     - Select the agent for each step
-     - Define the action to be performed
-     - Set dependencies (which steps must complete first)
-
-### Visualizing Workflows
-
-- Click on any workflow card to view its visual representation
-- The flow diagram shows:
-  - Each step as a node with agent name and action
-  - Dependencies as connecting arrows
-  - Step order and execution flow
-
-### Workflow Execution Flow
-
-The visual diagram represents:
-- **Nodes**: Individual workflow steps with assigned agents
-- **Edges**: Dependencies between steps (animated arrows)
-- **Order**: Sequential numbering of steps
-- **Parallel Execution**: Steps without dependencies can run in parallel
-
-## API Endpoints
-
-### Agents
-- `GET /api/agents` - List all agents
-- `GET /api/agents/:id` - Get specific agent
-- `POST /api/agents` - Create new agent
-- `PUT /api/agents/:id` - Update agent
-- `DELETE /api/agents/:id` - Delete agent
-
-### Workflows
-- `GET /api/workflows` - List all workflows
-- `GET /api/workflows/:id` - Get specific workflow
-- `POST /api/workflows` - Create new workflow
-- `PUT /api/workflows/:id` - Update workflow
-- `DELETE /api/workflows/:id` - Delete workflow
-
-## Data Structure
-
-### Agent
-```json
-{
-  "id": "uuid",
-  "name": "Agent Name",
-  "description": "Agent description",
-  "role": "analyst",
-  "capabilities": "Data analysis, visualization",
-  "mcpServers": [
-    {
-      "name": "Server Name",
-      "endpoint": "http://example.com/api",
-      "description": "Server description"
-    }
-  ],
-  "createdAt": "ISO timestamp",
-  "updatedAt": "ISO timestamp"
-}
-```
-
-### Workflow
-```json
-{
-  "id": "uuid",
-  "name": "Workflow Name",
-  "description": "Workflow description",
-  "workflowDescription": "Detailed cooperation description",
-  "steps": [
-    {
-      "id": "step-id",
-      "agentId": "agent-uuid",
-      "action": "Action to perform",
-      "order": 1,
-      "dependencies": [previous-step-order]
-    }
-  ],
-  "createdAt": "ISO timestamp",
-  "updatedAt": "ISO timestamp"
-}
-```
-
-## Technology Stack
-
-- **Backend**: Express.js, Node.js
-- **Frontend**: React 19, Vite
-- **Visualization**: ReactFlow
-- **Storage**: File-based JSON
-- **Styling**: Custom CSS
+1. **Configuration files**: See `config/default.json`
+2. **Environment variables**: Copy `config/.env.example` to `.env` and update values
+3. **Direct configuration**: Pass config dictionaries to agents and workflows
 
 ## Contributing
 
@@ -195,4 +136,17 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-ISC
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Roadmap
+
+- [ ] Add more agent types
+- [ ] Implement parallel workflow execution
+- [ ] Add MCP server implementation
+- [ ] Create comprehensive documentation
+- [ ] Add more examples
+- [ ] Performance optimizations
+
+## Support
+
+For questions, issues, or contributions, please open an issue on GitHub.
